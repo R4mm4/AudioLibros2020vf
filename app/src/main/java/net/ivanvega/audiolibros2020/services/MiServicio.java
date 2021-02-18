@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
@@ -20,7 +21,7 @@ import net.ivanvega.audiolibros2020.R;
 
 import java.util.Random;
 
-public class MiServicio extends Service {
+public class MiServicio extends Service implements MediaPlayer.OnPreparedListener {
 
     // Binder given to clients
     private final IBinder binder = new MiServicioBinder();
@@ -74,10 +75,18 @@ public class MiServicio extends Service {
             notificationManager.createNotificationChannel(channel);
         }
     }
-
-
+    public void onPrepared(MediaPlayer player){
+        player.start();
+    }
+    private static final String ACTION_PLAY = "com.example.action.PLAY";
+    MediaPlayer mediaPlayer = null;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if(intent.getAction().equals(ACTION_PLAY)){
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setOnPreparedListener(this);
+            mediaPlayer.prepareAsync();
+        }
         //Este método se manda llamar cuando invocas el servicio con startService()
         //tarea pesado debe ir en un subproceso y desencadenarse asquí
 

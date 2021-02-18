@@ -1,5 +1,7 @@
 package net.ivanvega.audiolibros2020;
 
+import android.app.ActivityManager;
+import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +27,7 @@ import net.ivanvega.audiolibros2020.services.MiIntentService;
 import net.ivanvega.audiolibros2020.services.MiServicio;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,7 +58,22 @@ public class DetalleFragment extends Fragment
     public DetalleFragment() {
         // Required empty public constructor
     }
-
+    /*private boolean isMyServiceRunning(String serviceClass){
+        final ActivityManager detalleFragment = (ActivityManager) Application.getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RunningServiceInfo> services = detalleFragment.getRunningServices(Integer.MAX_VALUE);
+        for(ActivityManager.RunningServiceInfo runningServiceInfo : services){
+            if(runningServiceInfo.service.getClassName().equals(serviceClass))
+                return true;
+        }
+        return false;
+    }*/
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) miServicio.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true; }
+        } return false;
+    }
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -80,6 +98,11 @@ public class DetalleFragment extends Fragment
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+        if(!isMyServiceRunning(MiServicio.class)){
+            iSer = new Intent(getContext(),MiServicio.class);
+            getContext().startService(iSer);
+            Log.d("App","Servicio iniciado");
         }
     }
 
