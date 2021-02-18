@@ -82,11 +82,6 @@ public class MiServicio extends Service implements MediaPlayer.OnPreparedListene
     MediaPlayer mediaPlayer = null;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent.getAction().equals(ACTION_PLAY)){
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setOnPreparedListener(this);
-            mediaPlayer.prepareAsync();
-        }
         //Este método se manda llamar cuando invocas el servicio con startService()
         //tarea pesado debe ir en un subproceso y desencadenarse asquí
 
@@ -101,8 +96,8 @@ public class MiServicio extends Service implements MediaPlayer.OnPreparedListene
         try {
             Thread.sleep(5000);
 
-                AsyncTask<Integer,
-                        Integer, Boolean> task = new AsyncTask<Integer, Integer, Boolean>() {
+            AsyncTask<Integer,
+                    Integer, Boolean> task = new AsyncTask<Integer, Integer, Boolean>() {
                 @Override
                 protected void onPreExecute() {
                     super.onPreExecute();
@@ -140,7 +135,7 @@ public class MiServicio extends Service implements MediaPlayer.OnPreparedListene
             };
 
             task.execute(1,2,3,4);
-            
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

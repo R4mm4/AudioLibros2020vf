@@ -67,13 +67,7 @@ public class DetalleFragment extends Fragment
         }
         return false;
     }*/
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) miServicio.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true; }
-        } return false;
-    }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -98,11 +92,6 @@ public class DetalleFragment extends Fragment
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-        if(!isMyServiceRunning(MiServicio.class)){
-            iSer = new Intent(getContext(),MiServicio.class);
-            getContext().startService(iSer);
-            Log.d("App","Servicio iniciado");
         }
     }
 
