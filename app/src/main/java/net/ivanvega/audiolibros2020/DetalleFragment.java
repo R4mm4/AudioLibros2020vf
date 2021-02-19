@@ -2,18 +2,22 @@ package net.ivanvega.audiolibros2020;
 
 import android.app.ActivityManager;
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -23,8 +27,10 @@ import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
 
+
 import net.ivanvega.audiolibros2020.services.MiIntentService;
 import net.ivanvega.audiolibros2020.services.MiServicio;
+import net.ivanvega.audiolibros2020.services.MyBroadcastReceiver;
 
 import java.io.IOException;
 import java.util.List;
@@ -50,10 +56,14 @@ public class DetalleFragment extends Fragment
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    boolean mBound = false;
+    boolean guardarlibro = false;
+    boolean seGuardo= false;
     MediaPlayer mediaPlayer;
     MediaController mediaController;
     Intent iSer;
+    MyBroadcastReceiver myBroadcastReceiver;
+
 
     public DetalleFragment() {
         // Required empty public constructor
@@ -189,10 +199,12 @@ public class DetalleFragment extends Fragment
 
         mediaController.hide();
         try {
-            mediaPlayer.stop();
-            mediaPlayer.release();
+            // mediaPlayer.stop();
+            // mediaPlayer.release();
+
         } catch (Exception e) {
             Log.d("Audiolibros", "Error en mediaPlayer.stop()");
+            super.onStop();
         }
 
     }
@@ -211,6 +223,14 @@ public class DetalleFragment extends Fragment
         mediaController.setAnchorView(getView());
         mediaController.setEnabled(true);
         mediaController.show();
+        SharedPreferences preferencias = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (preferencias.getBoolean("pref_autoreproducir", true)) {
+            Intent serviceIntent = new Intent(getActivity().getApplicationContext(), BroadcastReceiver.class);
+            serviceIntent.putExtra("inputExtra", guardarlibro);
+            serviceIntent.putExtra("in", seGuardo);
+            ContextCompat.startForegroundService(getActivity(), serviceIntent);
+            //bindService();
+        }
     }
 
     @Override
@@ -221,6 +241,7 @@ public class DetalleFragment extends Fragment
     @Override
     public void pause() {
         mediaPlayer.pause();
+        myBroadcastReceiver.StopAudio();
         int randf =  miServicio.getRandomNumber();
         Log.d("MSE", "Peticion  al servicio " + randf);
     }
@@ -273,5 +294,24 @@ public class DetalleFragment extends Fragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        MyBroadcastReceiver.MiBinder miBinder = (MyBroadcastReceiver.MiBinder) service;
+        myBroadcastReceiver = miBinder.getService();
+        mBound = true;
+    }
+
+    public void onServiceDisconnected(ComponentName name) {
+        mBound = false;
+    }
+    void bindService() {
+        getActivity().bindService(new Intent(getActivity(), MyBroadcastReceiver.class), serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    void unBindService() {
+        if (mBound == true) {
+            getActivity().unbindService(serviceConnection);
+            mBound = false;
+        }
     }
 }
