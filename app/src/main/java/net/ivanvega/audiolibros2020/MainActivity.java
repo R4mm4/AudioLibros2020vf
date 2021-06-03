@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -20,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 = new SelectorFragment();
 
         if ( findViewById(R.id.contenedor_pequeno) != null    &&
-            getSupportFragmentManager().findFragmentById(R.id.contenedor_pequeno) == null
+                getSupportFragmentManager().findFragmentById(R.id.contenedor_pequeno) == null
         ){
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.contenedor_pequeno,
@@ -48,17 +48,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void mostrarDetalle(int index){
-
+    public void mostrarDetalle(int id) {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         if(fragmentManager.findFragmentById(R.id.detalle_fragment)!=null){
 
             DetalleFragment fragment =
                     (DetalleFragment)
-                    fragmentManager.findFragmentById(R.id.detalle_fragment);
+                            fragmentManager.findFragmentById(R.id.detalle_fragment);
 
-            fragment.ponInfoLibro(index);
+            fragment.ponInfoLibro(id);
 
 
         }else{
@@ -67,18 +66,16 @@ public class MainActivity extends AppCompatActivity {
 
             Bundle bundle = new Bundle();
 
-            bundle.putInt(DetalleFragment.ARG_ID_LIBRO, index);
+            bundle.putInt(DetalleFragment.ARG_ID_LIBRO, id);
 
             detalleFragment.setArguments(bundle);
 
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
             fragmentManager.beginTransaction().replace(R.id.contenedor_pequeno
-            , detalleFragment).addToBackStack(null).commit();
+                    , detalleFragment).addToBackStack(null).commit();
 
         }
 
     }
-
-
 }

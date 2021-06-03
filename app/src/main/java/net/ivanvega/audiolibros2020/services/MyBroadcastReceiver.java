@@ -29,7 +29,7 @@ public class MyBroadcastReceiver <mediaController> extends MiServicio {
     DetalleFragment detalleFragment = new DetalleFragment();
     MediaController mediaController;
 
-    private final IBinder binder = new MiServicio.MiServicioBinder();
+    private final IBinder binder = new MiServicio.MiBinder();
     public IBinder onBind(Intent intent){
         return binder;
     }
